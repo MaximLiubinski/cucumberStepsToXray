@@ -1,0 +1,25 @@
+{
+  "name": "cucumberstepstoxray",
+  "version": "1.0.0",
+  "description": "PUT requests to jira issues",
+  "main": "index.js",
+  "scripts": {
+    "postinstall": "mkdir featureFiles",
+    "test": "node index.js"
+},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MaximLiubinski/cucumberStepsToXray.git"
+  },
+  "author": "Maksim Liubinski",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/MaximLiubinski/cucumberStepsToXray/issues"
+  },
+  "homepage": "https://github.com/MaximLiubinski/cucumberStepsToXray#readme",
+  "dependencies": {
+    "axios": "^0.19.0",
+    "klaw-sync": "^6.0.0",
+    "yargs": "^14.2.0"
+  }
+}
