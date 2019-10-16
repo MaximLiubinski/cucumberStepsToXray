@@ -16,7 +16,6 @@ arrayOfTests.forEach( test => {
         data: {
             fields: {
                 customfield_12291: test.type
-                // customfield_12292: test.steps
             }
         },
         json: true
@@ -31,7 +30,6 @@ arrayOfTests.forEach( test => {
         },
         data: {
             fields: {
-                // customfield_12291: test.type,
                 customfield_12292: test.steps
             }
         },
