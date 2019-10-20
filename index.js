@@ -5,42 +5,67 @@ const argv = require('yargs').argv;
 
 let arrayOfTests = featureParser();
 
-arrayOfTests.forEach( test => {
-    let requestType = {
-        method: `PUT`,
-        url: `https://jira.wolterskluwer.io/jira/rest/api/2/issue/${test.tag}`,
-        headers: {
-            "Content-Type": "application/json",
-            cookie: `JSESSIONID=${argv.cookie}`
-        },
-        data: {
-            fields: {
-                customfield_12291: test.type
-            }
-        },
-        json: true
-    };
+sendRequests(arrayOfTests);
 
-    let requestSteps = {
-        method: `PUT`,
-        url: `https://jira.wolterskluwer.io/jira/rest/api/2/issue/${test.tag}`,
-        headers: {
-            "Content-Type": "application/json",
-            cookie: `JSESSIONID=${argv.cookie}`
-        },
-        data: {
-            fields: {
-                customfield_12292: test.steps
-            }
-        },
-        json: true
-    };
+async function sendRequests(testsData) {
+    const waitFor = (ms) => new Promise(r => setTimeout(r, ms));
 
-    return request(requestType)
-        .then(() => {return request(requestSteps)})
-        .catch((error) => console.log(error));
-});
+    for(let i = 0; i < testsData.length ; i++) {
+        let requestType = {
+            method: `PUT`,
+            url: `https://jira.wolterskluwer.io/jira/rest/api/2/issue/${testsData[i].tag}`,
+            headers: {
+                "Content-Type": "application/json",
+                cookie: `JSESSIONID=${argv.cookie}`
+            },
+            data: {
+                fields: {
+                    customfield_12290: {
+                        "id": "13891"
+                    }
+                }
+            },
+            json: true
+        };
 
+        let requestScenarioType = {
+            method: `PUT`,
+            url: `https://jira.wolterskluwer.io/jira/rest/api/2/issue/${testsData[i].tag}`,
+            headers: {
+                "Content-Type": "application/json",
+                cookie: `JSESSIONID=${argv.cookie}`
+            },
+            data: {
+                fields: {
+                    customfield_12291: testsData[i].type
+                }
+            },
+            json: true
+        };
+
+        let requestSteps = {
+            method: `PUT`,
+            url: `https://jira.wolterskluwer.io/jira/rest/api/2/issue/${testsData[i].tag}`,
+            headers: {
+                "Content-Type": "application/json",
+                cookie: `JSESSIONID=${argv.cookie}`
+            },
+            data: {
+                fields: {
+                    customfield_12292: testsData[i].steps
+                }
+            },
+            json: true
+        };
+
+        await request(requestType).catch((error) => console.log(testsData[i].tag));
+        await waitFor(5);
+        await request(requestScenarioType).catch((error) => console.log(testsData[i].tag));
+        await waitFor(50);
+        await request(requestSteps).catch((error) => console.log(testsData[i].tag + i));
+        await waitFor(50);
+    }
+}
 
 function featureParser() {
     const featurePath = argv.path === undefined ? 'featureFiles' : argv.path;
@@ -52,13 +77,13 @@ function featureParser() {
 
     let requestData = [];
     featureFiles.forEach(file => {
-        let arrayOfTests = fs.readFileSync(file, 'utf8').split('@');
-        let result1 = arrayOfTests.filter(scenario => scenario.includes('jira(') && scenario.includes('Scenario'));
+        let arrayOfTests = fs.readFileSync(file, 'utf8').split('@j');
+        let result1 = arrayOfTests.filter(scenario => scenario.includes('ira(') && scenario.includes('Scenario'));
         result1.forEach(scenario => {
             let requestBody = {};
-            let regex = /jira\(([^\)]+)\)/g;
+            let regex = /ira\(([^\)]+)\)/g;
 
-            requestBody.tag = scenario.match(regex)[0].substring(5, scenario.match(regex)[0].length-1);
+            requestBody.tag = scenario.match(regex)[0].substring(4, scenario.match(regex)[0].length-1);
             requestBody.type = scenario.includes("Outline") ? {"id" : "13894"} : {"id" : "13893"};
             requestBody.steps = ("Given" + scenario.split("Given")[1]).trim();
 
